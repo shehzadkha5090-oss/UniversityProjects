@@ -1,0 +1,11 @@
+Lab 8 Anomaly Detection — UCI Student Performance (student-por.csv)
+Rows: 649 (full data, no subsample); features: all except G3; contamination=0.1
+IsolationForest flagged: 65 rows
+LocalOutlierFactor flagged: 65 rows
+Both flagged: 35; union: 95; Jaccard overlap: 0.3684
+PROXY-ONLY validation (no ground-truth anomalies; NOT accuracy):
+  IsolationForest flagged: {'n': 65, 'fail_rate': 0.4, 'mean_G3': 9.446153846153846, 'mean_absences': 5.846153846153846}; unflagged-by-either: {'n': 554, 'fail_rate': 0.12093862815884476, 'mean_G3': 12.229241877256317, 'mean_absences': 3.2418772563176894}
+  LOF flagged: {'n': 65, 'fail_rate': 0.36923076923076925, 'mean_G3': 10.046153846153846, 'mean_absences': 6.4}
+  Flagged by both: {'n': 35, 'fail_rate': 0.4857142857142857, 'mean_G3': 9.0, 'mean_absences': 6.2}
+Interpretation: flagged rows are described only by these proxy differences;
+  a higher fail rate / lower G3 among flagged rows does not prove they are true anomalies.

@@ -1,0 +1,69 @@
+Lab 13 — Causal Inference (OBSERVATIONAL)
+Dataset: UCI Student Performance, student-por.csv (shared_dataset/dataset.csv),
+  649 rows x 33 columns, semicolon-delimited. Outcome and treatment defined below.
+
+CAVEAT — READ FIRST:
+  There is NO randomised treatment in this dataset. This is an OBSERVATIONAL
+  analysis and cannot prove causality. The result must NOT be read as
+  "support causes passing". Any difference may reflect who was selected
+  for support, not an effect of support itself.
+
+Treatment and outcome
+  Treatment: schoolsup (extra educational support).
+  Group sizes: schoolsup = yes: 68 students; schoolsup = no: 581 students.
+  Outcome: pass = (G3 >= 10). G3 was NEVER used as a feature (it defines the outcome).
+  Raw pass rate, schoolsup = yes: 88.2% (60/68)
+  Raw pass rate, schoolsup = no:  84.2% (489/581)
+  Raw pass-rate difference (yes - no): +4.07 percentage points
+
+Confounders used for the propensity score (stated list)
+  school, sex, age, Medu, Fedu, studytime, failures, G1
+  Justification: each plausibly affects BOTH receiving extra support and passing.
+  G1 is a prior (first-period) grade, so it is pre-outcome and is a legitimate
+  confounder here; G2/G3 were excluded because they are post-treatment / outcome.
+  Categorical confounders (school, sex) were one-hot encoded; numeric confounders
+  were standardised (StandardScaler). Model: LogisticRegression (max_iter=1000).
+  Propensity-score range: 0.010 to 0.617;
+    treated range 0.010 to 0.617,
+    control range 0.010 to 0.555.
+  Propensity scores were clipped to [0.01, 0.99] before IPW to avoid extreme weights.
+
+Method 1 — IPW (inverse-probability weighting)
+  IPW ATE on pass: +17.15 percentage points
+  Standard error: bootstrap, 200 resamples, seed 42, full pipeline refit per resample: 14.39 percentage points
+  Bootstrap 95% percentile interval: [-10.29, +40.64] percentage points
+  (based on 200 successful bootstrap resamples)
+
+Method 2 — Nearest-neighbour propensity matching
+  Greedy matching on the propensity logit, caliper = 0.2 SD of the logit
+  (logit SD = 1.087, caliper = 0.217 on the logit scale), without replacement.
+  Treated units matched: 64 of 68 (94.1%)
+  Matched pass rate, treated: 89.1%
+  Matched pass rate, matched controls: 85.9%
+  Matched ATE on pass: +3.12 percentage points
+  Note: 4 treated unit(s) could not be matched within the caliper,
+  so the matched ATE describes the matched subset only, not all treated students.
+
+Covariate balance — standardised mean differences (SMD)
+  |SMD| below ~0.1 is a common rough guide for acceptable balance.
+  failures: before -0.002 | after IPW +0.140 | after matching +0.135
+  G1: before -0.246 | after IPW +0.201 | after matching -0.147
+  Medu: before -0.073 | after IPW -0.073 | after matching +0.000
+  school (GP=1): before +0.440 | after IPW -0.273 | after matching -0.082
+  Balance improved on all 4 checked variables after IPW weighting: False
+  Balance improved on all 4 checked variables after matching: False
+
+Interpretation — why this cannot be read causally
+  Ignorability (no unmeasured confounding) is assumed by both IPW and matching:
+  conditional on the stated confounders, receiving support must be as good as
+  random. That assumption cannot be verified from this file.
+  Unmeasured confounders plausibly remain, e.g. student motivation, teacher
+  judgement about who needs help, prior difficulties not captured by G1/failures,
+  and family circumstances beyond parental education. Support is typically GIVEN
+  to students who are struggling, so selection bias can mask or mimic an effect.
+  The raw gap, the IPW estimate and the matched estimate therefore describe
+  adjusted ASSOCIATIONS under strong, unverifiable assumptions — not proof that
+  support causes passing. Do not use these numbers to claim a causal effect.
+
+Files: results/results.txt (this file); visualizations/smd_before_after.png;
+  visualizations/propensity_overlap.png; main.py (reproducible, seed 42).

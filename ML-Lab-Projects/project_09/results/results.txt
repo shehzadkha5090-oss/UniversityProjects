@@ -1,0 +1,15 @@
+Lab 12 Calibration — UCI Student Performance (student-por.csv)
+Split (stratified, seed 42): train 388, calibration 98, test 163; total 649 (nominal 60/15/25, rounded by sklearn).
+ECE: manual, 10 equal-width bins, computed by this script. Calibration fitted on calibration set only (Platt sigmoid / isotonic, see script header).
+LogisticRegression [uncalibrated]: Brier=0.0657, ROC-AUC=0.9397, ECE=0.0657
+LogisticRegression [sigmoid]: Brier=0.0740, ROC-AUC=0.9397, ECE=0.0858
+LogisticRegression [isotonic]: Brier=0.0732, ROC-AUC=0.9133, ECE=0.0530
+RandomForest [uncalibrated]: Brier=0.0691, ROC-AUC=0.9419, ECE=0.0573
+RandomForest [sigmoid]: Brier=0.0799, ROC-AUC=0.9419, ECE=0.0909
+RandomForest [isotonic]: Brier=0.0688, ROC-AUC=0.9306, ECE=0.0521
+HistGradientBoosting [uncalibrated]: Brier=0.0599, ROC-AUC=0.9614, ECE=0.0452
+HistGradientBoosting [sigmoid]: Brier=0.0669, ROC-AUC=0.9614, ECE=0.0902
+HistGradientBoosting [isotonic]: Brier=0.0671, ROC-AUC=0.9538, ECE=0.0516
+Recommendation: HistGradientBoosting + sigmoid — lowest calibrated Brier score on test (0.0669).
+Note: no calibrated variant beat the best uncalibrated model (HistGradientBoosting uncalibrated Brier 0.0599);
+  with only 98 calibration rows, calibration hurt Brier here — the recommendation above is among calibrated variants only.

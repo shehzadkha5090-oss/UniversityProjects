@@ -1,0 +1,13 @@
+# Shared requirements for all 15 ML Lab Projects (v4, Student Performance)
+# Install: pip install -r requirements.txt
+# Python 3.10+ recommended. Versions below are the ones used for the verified runs.
+numpy>=1.26
+pandas>=2.0
+scikit-learn>=1.5
+scipy>=1.11
+statsmodels>=0.14
+imbalanced-learn>=0.12
+matplotlib>=3.7
+seaborn>=0.13
+shap>=0.46
+umap-learn>=0.5

@@ -1,0 +1,8 @@
+Dataset: UCI Student Performance (student-por.csv), FULL 649 rows (no train/test split here)
+Target: pass = (G3 >= 10); Pass 549 (84.6%), Fail 100 (15.4%); G3 never an input feature
+PRE-STATED RECOMMENDATION RULE: recommend the method with the highest 5-NN CV accuracy in 2-D; ties broken by trustworthiness.
+Preprocessed feature matrix: (649, 58)
+PCA: silhouette (descriptive only)=0.2380, 5-NN CV accuracy=0.8536, trustworthiness=0.7578
+t-SNE: silhouette (descriptive only)=0.1511, 5-NN CV accuracy=0.8458, trustworthiness=0.9251
+UMAP: silhouette (descriptive only)=0.1493, 5-NN CV accuracy=0.8551, trustworthiness=0.8470
+RECOMMENDED by the pre-stated rule: UMAP (5-NN CV accuracy=0.8551, trustworthiness=0.8470)
