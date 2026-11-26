@@ -1,0 +1,34 @@
+Dataset: UCI Student Performance (student-por.csv), 649 rows
+Target: pass = (G3 >= 10); pass 549 (84.6%), fail 100
+Split: stratified 75/25, seed 42; train 486, test 163
+
+LogisticRegression: ROC-AUC=0.9420 accuracy=0.9202
+DecisionTree(max_depth=4): ROC-AUC=0.7797 accuracy=0.8896
+RandomForest(200 trees): ROC-AUC=0.9432 accuracy=0.9141
+
+Permutation importance (RandomForest, test set, ROC-AUC drop), top 10:
+  G2: 0.1262 (+/- 0.0152)
+  G1: 0.0644 (+/- 0.0092)
+  famrel: 0.0111 (+/- 0.0014)
+  freetime: 0.0023 (+/- 0.0021)
+  reason: 0.0023 (+/- 0.0016)
+  health: 0.0020 (+/- 0.0012)
+  nursery: 0.0016 (+/- 0.0006)
+  activities: 0.0012 (+/- 0.0009)
+  paid: 0.0010 (+/- 0.0003)
+  Fedu: 0.0009 (+/- 0.0020)
+
+SHAP: TreeExplainer on RandomForest, first 100 test rows (subsample).
+Top 10 features by mean |SHAP value|:
+  num__G1: 0.0793
+  num__G2: 0.0744
+  cat__school_GP: 0.0197
+  num__failures: 0.0191
+  cat__school_MS: 0.0173
+  cat__higher_yes: 0.0140
+  cat__higher_no: 0.0133
+  num__Medu: 0.0069
+  num__goout: 0.0067
+  num__Walc: 0.0064
+
+Trade-off: the forest's explanations (permutation + SHAP) agree that earlier grades dominate, but only the simpler models can be read directly as rules/coefficients; the forest buys accuracy at the cost of needing post-hoc explanation. See README for the numbers.

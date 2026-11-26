@@ -1,0 +1,17 @@
+Dataset: UCI Student Performance (student-por.csv), 649 rows
+Target: pass = (G3 >= 10); pass 549 (84.6%), fail 100
+Model: LogisticRegression (manual CV loops; cross_val_score not used).
+
+Shuffled 5-fold KFold: folds=['0.9594', '0.9613', '0.9586', '0.9695', '0.9259'] mean=0.9549 std=0.0150
+Stratified 5-fold KFold: folds=['0.9586', '0.9332', '0.9700', '0.9577', '0.9450'] mean=0.9529 std=0.0127
+LeaveOneGroupOut by school (2 folds): folds=['0.9374', '0.9215'] mean=0.9295 std=0.0079
+
+Why the school-grouped score is much lower: each fold trains on one
+school and tests on a genuinely different school (GP pass 92.4% vs MS
+69.9%), so the distribution shift of Lab 3 hits it in full — the model
+has never seen the test school's student mix.
+Why the shuffled score is optimistic for deployment to a new school:
+shuffling mixes both schools into every train and test fold, so the
+test rows resemble the training rows; it estimates 'a new student from
+a known school', not 'a new school'. For deployment to an unseen
+school, the grouped (LeaveOneGroupOut) score is the honest estimate.

@@ -1,0 +1,21 @@
+Dataset: UCI Student Performance (student-por.csv), 649 rows x 33 cols
+Target: pass = (G3 >= 10); pass 549 (84.6%), fail 100
+REAL missingness: 0 missing values in the whole file (all 33 columns 100% complete).
+Per-column completeness: every column 649/649 non-missing (0.0% missing).
+All missingness below is a LABELLED SIMULATION introduced by this script,
+not original data. Split: stratified 75/25, seed 42; train 486, test 163.
+
+MCAR: introduced missing values = 4165 (20.1% of feature cells)
+  median/mode: ROC-AUC=0.9319
+  KNN(k=5): ROC-AUC=0.9280
+MAR: introduced missing values = 216 (1.0% of feature cells)
+  median/mode: ROC-AUC=0.9451
+  KNN(k=5): ROC-AUC=0.9446
+MNAR: introduced missing values = 148 (0.7% of feature cells)
+  median/mode: ROC-AUC=0.9442
+  KNN(k=5): ROC-AUC=0.9423
+
+Note: MNAR is the hardest case in principle because the missingness
+depends on values that are themselves hidden, so no imputer can fully
+recover them; KNN vs median/mode differences here are small because
+G1/G2 carry most of the signal and are never masked in MAR/MNAR.

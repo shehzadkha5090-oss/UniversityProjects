@@ -1,0 +1,98 @@
+Lab 7 — High-Dimensional Feature Selection (project_16)
+Dataset: UCI Student Performance, student-por.csv ONLY
+  (shared_dataset/dataset.csv, 649 rows x 33 cols, semicolon-delimited, sep=';')
+  student-mat.csv NOT used.
+
+CAVEAT: The original dataset has only 32 features, NOT 10,000+, so the lab's
+stated condition is NOT met. This project is an honest adaptation, not a claim
+that the condition holds.
+
+Target: pass = (G3 >= 10); pass 549 (84.6%), fail 100 (15.4%)
+G3 was NEVER used as a feature. Default features: all columns except G3 (32 features).
+Split: stratified 75/25 train/test, seed 42 (train 486, test 163).
+Preprocessing (Pipeline, fit on train only): numeric median-impute + StandardScaler;
+  categorical most-frequent-impute + OneHotEncoder(handle_unknown='ignore').
+Preprocessed features: 58 (15 numeric + 43 one-hot).
+Polynomial expansion: PolynomialFeatures(degree=2, include_bias=False) on ALL
+  preprocessed features: p = 58 + 58*59/2 = 1769 features.
+  p > n: 1769 > 649 rows in total and > 486 training rows, but p is NOT 10,000,
+  so this project does NOT claim 10,000 features.
+
+Results (same split for every method):
+  Reference: L2 LR on 58 preprocessed features (no expansion): n_features=58, train ROC-AUC=0.9859, test ROC-AUC=0.9420, test accuracy=0.9202
+  (a) L2 LR, all expanded features: n_features=1769, train ROC-AUC=1.0000, test ROC-AUC=0.9377, test accuracy=0.9202
+  (b) L1 LR (saga) selection: n_features=22, train ROC-AUC=0.9854, test ROC-AUC=0.9664, test accuracy=0.9264
+  (c) SelectKBest f_classif k=50 + L2 LR: n_features=50, train ROC-AUC=0.9831, test ROC-AUC=0.9649, test accuracy=0.9202
+  (d) Stability selection (>=50%) + L2 LR: n_features=13, train ROC-AUC=0.9868, test ROC-AUC=0.9577, test accuracy=0.8957
+
+(b) L1 details: penalty='l1', solver='saga', C=0.1, max_iter=1000; non-zero coefficients = 22 of 1769.
+(c) SelectKBest details: f_classif, k=50.
+(d) Stability selection details: 20 bootstrap resamples of the training
+  set, L1 (saga, C=0.1, max_iter=1000) refit on each; features kept if
+  selected in >= 50% of resamples (>= 10 of 20); kept = 13 features; then L2 LR on those features.
+
+Overlap between L1-selected and stability-selected feature sets:
+  L1-selected: 22, stability-selected: 13, in common: 13, union: 22, Jaccard = 0.5909.
+  Features in common: num__G1, num__G2, num__traveltime num__Dalc, num__failures^2, num__famrel^2, num__freetime num__goout, num__absences^2, num__G1 num__G2, num__G1 cat__guardian_mother, num__G1 cat__schoolsup_no, num__G2^2, num__G2 cat__schoolsup_no, cat__school_GP cat__higher_yes
+
+L1-selected features:
+  - num__G1
+  - num__G2
+  - num__traveltime num__Dalc
+  - num__failures^2
+  - num__failures num__goout
+  - num__failures num__Dalc
+  - num__failures cat__famsize_GT3
+  - num__failures cat__reason_course
+  - num__failures cat__schoolsup_no
+  - num__famrel^2
+  - num__famrel num__freetime
+  - num__famrel num__Dalc
+  - num__freetime num__goout
+  - num__Dalc cat__famsize_GT3
+  - num__absences^2
+  - num__G1 num__G2
+  - num__G1 cat__Pstatus_T
+  - num__G1 cat__guardian_mother
+  - num__G1 cat__schoolsup_no
+  - num__G2^2
+  - num__G2 cat__schoolsup_no
+  - cat__school_GP cat__higher_yes
+Stability-selected features:
+  - num__G1
+  - num__G2
+  - num__traveltime num__Dalc
+  - num__failures^2
+  - num__famrel^2
+  - num__freetime num__goout
+  - num__absences^2
+  - num__G1 num__G2
+  - num__G1 cat__guardian_mother
+  - num__G1 cat__schoolsup_no
+  - num__G2^2
+  - num__G2 cat__schoolsup_no
+  - cat__school_GP cat__higher_yes
+
+Discussion — p>>n overfitting, honestly:
+  Method (a), all 1769 features: train ROC-AUC = 1.0000 but test ROC-AUC = 0.9377 — a train-test gap of 0.0623.
+  With p (1769) far above the 486 training rows, the L2 model can essentially
+  memorise the training set (train ROC-AUC at/near 1.0) while generalising worse,
+  which is exactly the p>>n failure mode: many more parameters than observations,
+  so fitted coefficients are unstable and test performance drops.
+  Selection helps here in the sense that methods (b), (c) and (d) use far fewer
+  features, do not show the same train-test gap, and beat (a) on test ROC-AUC
+  (0.9664 / 0.9649 / 0.9577 vs 0.9377) — though stability selection's test
+  accuracy (0.8957) is below (a)'s (0.9202), so the gain is in ranking, not in
+  every metric. Selection does NOT automatically beat the simpler 58-feature
+  reference model (test ROC-AUC 0.9420): with only 486 training rows, the
+  selected sets are themselves noisy, and a univariate or L1 screen can discard
+  weak-but-jointly-useful signals. The L1/stability overlap is reassuring in one
+  respect — all 13 stability-selected features are also L1-selected (Jaccard
+  0.5909 only because the L1 set is larger, 22 vs 13) — but that stability is
+  over bootstrap resamples of the same small training set, not over new data.
+  The honest reading is that expansion to p=1769 bought no reliable gain
+  over the 58-feature model on this small dataset; selection mainly recovered
+  comparable-or-better test ROC-AUC with far fewer features, rather than
+  transforming performance.
+  No result here should be read as evidence about true 10,000+ feature settings,
+  because that condition is not met (see CAVEAT above).

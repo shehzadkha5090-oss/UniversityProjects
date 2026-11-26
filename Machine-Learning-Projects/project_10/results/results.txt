@@ -1,0 +1,9 @@
+Lab 14 Hyperparameter Search — UCI Student Performance (student-por.csv)
+RandomForest on the FULL 649 rows (no subsample claim). Search: 3-fold CV on train only.
+Split: stratified 75/25 seed 42 — train 486, test 163 (test not used for search).
+Bayesian encoding: max_depth searched on [3, 25] with 25 mapped to None; min_samples_leaf on [1, 10] (int); n_estimators fixed 200.
+Grid search: best CV ROC-AUC=0.9702, best params={'clf__max_depth': 5, 'clf__min_samples_leaf': 2, 'clf__n_estimators': 100}, time=14.5s, configs=12
+Random search: best CV ROC-AUC=0.9698, best params={'clf__n_estimators': 200, 'clf__min_samples_leaf': 2, 'clf__max_features': 'sqrt', 'clf__max_depth': None}, time=14.5s, configs=12
+Manual Bayesian (GP + Expected Improvement): best CV ROC-AUC=0.9708, best params={'n_estimators': 200, 'max_depth': 20, 'min_samples_leaf': 7}, time=11.2s, evaluations=12
+Recommendation: Bayesian search — highest 3-fold CV ROC-AUC (0.9708) at equal budget (12 configs);
+  if two methods tie within noise, prefer the simpler/faster one, since 486 train rows make small CV differences unreliable.
